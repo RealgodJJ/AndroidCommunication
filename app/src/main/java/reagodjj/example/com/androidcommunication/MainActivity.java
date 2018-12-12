@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,16 +97,13 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("InflateParams")
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             ViewHolder viewHolder;
             if (convertView == null) {
-                assert layoutInflater != null;
-                convertView = layoutInflater.inflate(R.layout.list_item, null);
-                viewHolder = new ViewHolder();
-                viewHolder.ivIcon = convertView.findViewById(R.id.iv_item);
-                viewHolder.tvappName = convertView.findViewById(R.id.tv_item);
-//                ImageView ivItem = convertView.findViewById(R.id.iv_item);
-//                TextView tvItem = convertView.findViewById(R.id.tv_item);
+//                LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                assert layoutInflater != null;
+//                convertView = layoutInflater.inflate(R.layout.list_item, null);
+                convertView = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
+                viewHolder = new ViewHolder(convertView);
                 convertView.setTag(viewHolder);
 //                tvItem.setText(appInfos.get(position).activityInfo.loadLabel(getPackageManager()));
 //                ivItem.setImageDrawable(appInfos.get(position).activityInfo.loadIcon(getPackageManager()));
@@ -118,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
             //布局和数据之间的绑定
             viewHolder.ivIcon.setImageDrawable(appInfos.get(position).activityInfo.loadIcon(context.getPackageManager()));
-            viewHolder.tvappName.setText(appInfos.get(position).activityInfo.loadLabel(context.getPackageManager()));
+            viewHolder.tvAppName.setText(appInfos.get(position).activityInfo.loadLabel(context.getPackageManager()));
 
             //2.设置选项布局
             convertView.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +133,12 @@ public class MainActivity extends AppCompatActivity {
 
         class ViewHolder {
             ImageView ivIcon;
-            TextView tvappName;
+            TextView tvAppName;
+
+            ViewHolder(View view) {
+                ivIcon = view.findViewById(R.id.iv_item);
+                tvAppName = view.findViewById(R.id.tv_item);
+            }
         }
     }
 }
