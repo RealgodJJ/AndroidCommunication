@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         //1.设置单选项的方法
         final List<ResolveInfo> appInfos = getAppInfos();
-        lvExample.setAdapter(new AppNameAdapter(appInfos));
+        lvExample.setAdapter(new AppNameAdapter(appInfos, this));
 
         lvExample.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -62,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 获取所有应用的信息
-     * @return  应用的信息列表
+     *
+     * @return 应用的信息列表
      */
     private List<ResolveInfo> getAppInfos() {
         Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
@@ -72,9 +73,11 @@ public class MainActivity extends AppCompatActivity {
 
     class AppNameAdapter extends BaseAdapter {
         private List<ResolveInfo> appInfos;
+        private Context context;
 
-        AppNameAdapter(List<ResolveInfo> appInfos) {
+        AppNameAdapter(List<ResolveInfo> appInfos, Context context) {
             this.appInfos = appInfos;
+            this.context = context;
         }
 
         @Override
@@ -92,33 +95,49 @@ public class MainActivity extends AppCompatActivity {
             return position;
         }
 
-        @SuppressLint({"ViewHolder", "InflateParams"})
+        @SuppressLint("InflateParams")
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert layoutInflater != null;
-            convertView = layoutInflater.inflate(R.layout.list_item, null);
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                assert layoutInflater != null;
+                convertView = layoutInflater.inflate(R.layout.list_item, null);
+                viewHolder = new ViewHolder();
+                viewHolder.ivIcon = convertView.findViewById(R.id.iv_item);
+                viewHolder.tvappName = convertView.findViewById(R.id.tv_item);
+//                ImageView ivItem = convertView.findViewById(R.id.iv_item);
+//                TextView tvItem = convertView.findViewById(R.id.tv_item);
+                convertView.setTag(viewHolder);
+//                tvItem.setText(appInfos.get(position).activityInfo.loadLabel(getPackageManager()));
+//                ivItem.setImageDrawable(appInfos.get(position).activityInfo.loadIcon(getPackageManager()));
 
-            if (convertView != null) {
-                ImageView ivItem = convertView.findViewById(R.id.iv_item);
-                TextView tvItem = convertView.findViewById(R.id.tv_item);
-                tvItem.setText(appInfos.get(position).activityInfo.loadLabel(getPackageManager()));
-                ivItem.setImageDrawable(appInfos.get(position).activityInfo.loadIcon(getPackageManager()));
-
-                //2.设置选项布局
-                convertView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String packageName = appInfos.get(position).activityInfo.packageName;
-                        String className = appInfos.get(position).activityInfo.name;
-
-                        ComponentName componentName = new ComponentName(packageName, className);
-
-                        startActivity(new Intent().setComponent(componentName));
-                    }
-                });
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
             }
+
+            //布局和数据之间的绑定
+            viewHolder.ivIcon.setImageDrawable(appInfos.get(position).activityInfo.loadIcon(context.getPackageManager()));
+            viewHolder.tvappName.setText(appInfos.get(position).activityInfo.loadLabel(context.getPackageManager()));
+
+            //2.设置选项布局
+            convertView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String packageName = appInfos.get(position).activityInfo.packageName;
+                    String className = appInfos.get(position).activityInfo.name;
+
+                    ComponentName componentName = new ComponentName(packageName, className);
+
+                    startActivity(new Intent().setComponent(componentName));
+                }
+            });
             return convertView;
+        }
+
+        class ViewHolder {
+            ImageView ivIcon;
+            TextView tvappName;
         }
     }
 }
